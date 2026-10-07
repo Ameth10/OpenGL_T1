@@ -26,7 +26,7 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 }
 // ----- FIN AJOUT -----
 
-// ----- AJOUT 2a : touche M = changer de méthode -----
+// ----- AJOUT 2a : touche X = changer de méthode -----
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     if (key == GLFW_KEY_X && action == GLFW_PRESS)
