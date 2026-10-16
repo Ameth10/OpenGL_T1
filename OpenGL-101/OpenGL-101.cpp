@@ -42,6 +42,10 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 
 int main(void)
 {
+
+    std::cout << PascalTiangle(4,3) << '\n';
+
+
     Application app;
 
     GLFWwindow* window;

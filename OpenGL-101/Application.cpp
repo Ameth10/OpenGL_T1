@@ -2,7 +2,7 @@
 #include "GL/glew.h"
 // ici w dans wglew est pour Windows
 #include "GL/wglew.h"
-
+#include <iostream>
 #include <array>
 #include <cstddef>   // AJOUT : offsetof
 #include "Application.h"
@@ -10,9 +10,12 @@
 // ----- AJOUT : algorithme de De Casteljau (version du cours) -----
 // Entrée : les points de contrôle P0..Pn et une valeur de t entre 0 et 1
 // Sortie : le point Q(t) de la courbe de Bézier
-Point deCasteljau(const std::vector<Point>& P, float t)
+Point deCasteljau(const std::vector<Point> P, float t)
 {
-    int n = (int)P.size() - 1;
+    if (t == 0) {
+        return P[0];
+    }
+    int n = P.size() - 1;
 
     // Étape 0 : P_i^(0) = P_i  (on copie les points de contrôle)
     std::vector<Point> Q = P;
@@ -20,6 +23,8 @@ Point deCasteljau(const std::vector<Point>& P, float t)
     // Pour j : 1 -> n
     for (int j = 1; j <= n; j++)
     {
+        double x = Q[0].x;
+        double y = Q[0].y;
         // Pour i : 0 -> n-j
         for (int i = 0; i <= n - j; i++)
         {
@@ -32,7 +37,43 @@ Point deCasteljau(const std::vector<Point>& P, float t)
     // Sortie : Q(t) = P_0^(n)
     return Q[0];
 }
-// ----- FIN AJOUT -----
+/*  0   1   2   3 
+0:  1
+1:  1   1
+2:  1   2   1
+3:  1   3   3   1
+4:  1   4   6   4   1
+...
+*/
+
+int PascalTiangle(int i, int j) {
+    if ((j == 0) || (j == i))
+        return 1;
+    else if (j > i)
+        return 0;
+    if (j == 1)
+        return i;
+
+    if (j > (i+1) / 2)
+        return PascalTiangle(i, i - j);
+    return PascalTiangle(i - 1, j - 1) + PascalTiangle(i - 1, j);
+}
+
+Point Bernstein(const std::vector<Point> P, float t) {
+    Point Q = Point({
+        0.f,0.f
+        });
+    int n = P.size() - 1;
+
+    // Somme 0..i..n : Tp(n,i) t^i * (1-t)^(n-i)  * Pi
+    for (int i = 0; i <= n; ++i) {
+        const float _temp = PascalTiangle(n, i) * pow(t, i) * pow(1 - t, n - i);
+        Q.x += _temp * P[i].x;
+        Q.y += _temp * P[i].y;
+    }
+
+    return Q;
+}
 
 bool Application::initialize()
 {
@@ -111,10 +152,11 @@ void Application::update()
         vertices.push_back(Vertex{ vec3{x, y, 0.f}, vec3{0.9f, 0.1f, 0.1f} });
     }
 
-    // ----- AJOUT : points de la courbe de Bézier (De Casteljau), en bleu -----
-    // Pour t : 0 -> 1, pas = 1 / m_nbPas
-    m_nbPointsCourbe = 0;
-    if (m_controlPoints.size() >= 2)
+    // ----- points de la courbe de Bézier (De Casteljau), en Rouge -----
+    time_t time = std::time(0);
+
+    //m_nbPointsCourbe = 0;
+    for (int i = 0; i<100; i++) if (m_controlPoints.size() >= 2)
     {
         for (int k = 0; k <= m_nbPas; k++)
         {
@@ -123,15 +165,42 @@ void Application::update()
 
             float x = 2.f * q.x / m_width - 1.f;
             float y = 1.f - 2.f * q.y / m_height;
-            vertices.push_back(Vertex{ vec3{x, y, 0.f}, vec3{0.1f, 0.2f, 0.9f} });
+            if (i == 0) {
+                vertices.push_back(Vertex{ vec3{x+0.01f, y, 0.f}, vec3{0.9f, 0.2f, 0.f} });
+            }
             m_nbPointsCourbe++;
         }
     }
+    const time_t casteljau = std::time(0) - time;
+
+    std::cout << "De casteljau : " << (std::time(0) - time)*100. << '\n';
+    // ----- points de la courbe de Bézier (Bernstein), en Bleu -----
+    time = std::time(0);
+
+    for (int i = 0; i < 100; i++) if (m_controlPoints.size() >= 2)
+    {
+        for (int k = 0; k <= m_nbPas; k++)
+        {
+            float t = (float)k / m_nbPas;
+            Point q = Bernstein(m_controlPoints, t);
+
+            float x = 2.f * q.x / m_width - 1.f;
+            float y = 1.f - 2.f * q.y / m_height;
+            if (i == 0) {
+                vertices.push_back(Vertex{ vec3{ x, y+0.01f, 0.f }, vec3{ 0.1f, 0.2f, 0.9f } });
+            }
+            m_nbPointsCourbe++;
+        }
+    }
+    const time_t bernstein = std::time(0) - time;
+    std::cout << "nb : " << m_controlPoints.size() << "\ncastle : " << casteljau << "\nbernstein : " << bernstein << '\n';
+
     // ----- FIN AJOUT -----
 
     glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex),
         vertices.data(), GL_DYNAMIC_DRAW);
+
     // ----- FIN AJOUT -----
 }
 

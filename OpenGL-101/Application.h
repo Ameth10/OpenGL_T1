@@ -6,6 +6,7 @@
 #include "../common/GLShader.h"
 
 // A deplacer dans un entete specifique
+int PascalTiangle(int i, int j);
 
 struct vec3
 {
@@ -43,7 +44,7 @@ struct Application
     std::vector<Point> m_controlPoints;
 
     // AJOUT : nombre de pas pour tracer la courbe (pas = 1 / m_nbPas)
-    int m_nbPas = 100;
+    int m_nbPas = 10000;
     int m_nbPointsCourbe = 0;   // nombre de points de la courbe envoyés au GPU
 
     // AJOUT 2a : false = De Casteljau, true = Bernstein (triangle de Pascal)
