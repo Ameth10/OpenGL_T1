@@ -2,7 +2,9 @@
 
 #include <cstdint>
 #include <vector>   // AJOUT
-#include "Mat4.cpp"
+#include "Point.h"
+#include "Mat3.cpp"
+
 #include "../common/GLShader.h"
 
 
@@ -10,10 +12,6 @@
 int PascalTiangle(int i, int j);
 
 
-struct vec3
-{
-    float x, y, z;
-};
 
 struct Vertex
 {
@@ -22,10 +20,6 @@ struct Vertex
 };
 
 // AJOUT : point de contrôle en pixels (comme la souris)
-struct Point
-{
-    float x, y;
-};
 
 struct Application
 {
@@ -44,7 +38,7 @@ struct Application
 
     // AJOUT : les points de contrôle P0, ..., Pn
     std::vector<Point> m_controlPoints;
-    Mat4 transform = Mat4::identity();
+    Mat3 s_transform;
 
     // AJOUT : nombre de pas pour tracer la courbe (pas = 1 / m_nbPas)
     int m_nbPas = 10000;

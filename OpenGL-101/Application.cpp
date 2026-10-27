@@ -6,6 +6,7 @@
 #include <array>
 #include <cstddef>   // AJOUT : offsetof
 #include "Application.h"
+#include "Point.h"
 
 // ----- AJOUT : algorithme de De Casteljau (version du cours) -----
 // Entrée : les points de contrôle P0..Pn et une valeur de t entre 0 et 1
@@ -85,6 +86,7 @@ bool Application::initialize()
     m_basicShader.LoadFragmentShader("basic.fs.glsl");
     m_basicShader.Create();
 
+
     const std::array<Vertex, 4> quadVertices{
         Vertex{vec3{-0.8f, -0.8f, 0.f}, vec3{1.f, 0.f, 0.f}},
         Vertex{vec3{+0.8f, -0.8f, 0.f}, vec3{0.f, 1.f, 0.f}},
@@ -135,42 +137,39 @@ void Application::deinitialize()
 
 void Application::update()
 {
+    const float cx = m_width / 2.f, cy = m_height / 2.f;
+    const float sx = 1.5f, sy = 1.f;
+
+    s_transform =
+        Mat3::translation(cx, cy)
+        * Mat3::rotate(1)
+        * Mat3::scale(sx, sy)
+        * Mat3::translation(0.f, 100.f)
+        * Mat3::translation(-cx, -cy);
+
+    auto toNDC = [&](const Point& p) {
+        Point pp = s_transform * p;   // le pivot est déjà inclus dans s_transform
+        return vec3{ 2.f * pp.x / m_width - 1.f, 1.f - 2.f * pp.y / m_height, 0.f };
+    };
+
     // ----- AJOUT : on envoie les points de contrôle au GPU -----
     // Chaque point est mis 2 fois : en gris (polygone) puis en rouge (points)
     std::vector<Vertex> vertices;
     for (const Point& p : m_controlPoints)
     {
         // pixels -> coordonnées OpenGL entre -1 et 1 (y inversé)
-        float x = 2.f * p.x / m_width - 1.f;
-        float y = 1.f - 2.f * p.y / m_height;
-        vertices.push_back(Vertex{ vec3{x, y, 0.f}, vec3{0.4f, 0.4f, 0.4f} });
+        vec3 pp = toNDC(p);
+        vertices.push_back(Vertex{ pp, vec3{0.4f, 0.4f, 0.4f} });
     }
     for (const Point& p : m_controlPoints)
     {
-        float x = 2.f * p.x / m_width - 1.f;
-        float y = 1.f - 2.f * p.y / m_height;
-        vertices.push_back(Vertex{ vec3{x, y, 0.f}, vec3{0.9f, 0.1f, 0.1f} });
+        vec3 pp = toNDC(p);
+        vertices.push_back(Vertex{ pp, vec3{ 0.9f, 0.4f, 0.4f } });
     }
 
     // ----- points de la courbe de Bézier (De Casteljau), en Rouge -----
     time_t time = std::time(0);
 
-    //m_nbPointsCourbe = 0;
-    /*for (int i = 0; i<100; i++) if (m_controlPoints.size() >= 2)
-    {
-        for (int k = 0; k <= m_nbPas; k++)
-        {
-            float t = (float)k / m_nbPas;
-            Point q = deCasteljau(m_controlPoints, t);
-
-            float x = 2.f * q.x / m_width - 1.f;
-            float y = 1.f - 2.f * q.y / m_height;
-            if (i == 0) {
-                vertices.push_back(Vertex{ vec3{x+0.01f, y, 0.f}, vec3{0.9f, 0.2f, 0.f} });
-            }
-            m_nbPointsCourbe++;
-        }
-    }*/
 
     if (m_controlPoints.size() >= 2)
     {
@@ -179,8 +178,10 @@ void Application::update()
             float t = (float)k / m_nbPas;
             Point q = deCasteljau(m_controlPoints, t);
 
-            float x = 2.f * q.x / m_width - 1.f;
-            float y = 1.f - 2.f * q.y / m_height;
+            Point qp = s_transform * q;
+
+            float x = 2.f * qp.x / m_width - 1.f;
+            float y = 1.f - 2.f * qp.y / m_height;
             
                 vertices.push_back(Vertex{ vec3{x + 0.01f, y, 0.f}, vec3{0.9f, 0.2f, 0.f} });
         }
@@ -190,22 +191,6 @@ void Application::update()
     //d::cout << "De casteljau : " << (std::time(0) - time)*100. << '\n';
     // ----- points de la courbe de Bézier (Bernstein), en Bleu -----
     time = std::time(0);
-
-    /*for (int i = 0; i < 100; i++) if (m_controlPoints.size() >= 2)
-    {
-        for (int k = 0; k <= m_nbPas; k++)
-        {
-            float t = (float)k / m_nbPas;
-            Point q = Bernstein(m_controlPoints, t);
-
-            float x = 2.f * q.x / m_width - 1.f;
-            float y = 1.f - 2.f * q.y / m_height;
-            if (i == 0) {
-                vertices.push_back(Vertex{ vec3{ x, y+0.01f, 0.f }, vec3{ 0.1f, 0.2f, 0.9f } });
-            }
-            m_nbPointsCourbe++;
-        }
-    }*/
 
     if (m_controlPoints.size() >= 2)
     {
@@ -221,7 +206,7 @@ void Application::update()
         }
     }
     //nst time_t bernstein = std::time(0) - time;
-   //td::cout << "nb : " << m_controlPoints.size() << "\ncastle : " << casteljau << "\nbernstein : " << bernstein << '\n';
+    //td::cout << "nb : " << m_controlPoints.size() << "\ncastle : " << casteljau << "\nbernstein : " << bernstein << '\n';
 
     // ----- FIN AJOUT -----
 

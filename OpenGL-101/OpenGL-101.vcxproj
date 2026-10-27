@@ -135,10 +135,12 @@
   <ItemGroup>
     <ClCompile Include="..\common\GLShader.cpp" />
     <ClCompile Include="Application.cpp" />
+    <ClCompile Include="Mat3.cpp" />
     <ClCompile Include="OpenGL-101.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
+    <ClInclude Include="Point.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
