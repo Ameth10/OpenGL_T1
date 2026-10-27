@@ -5,8 +5,10 @@
 
 #include "../common/GLShader.h"
 
+
 // A deplacer dans un entete specifique
 int PascalTiangle(int i, int j);
+
 
 struct vec3
 {
@@ -49,6 +51,23 @@ struct Application
 
     // AJOUT 2a : false = De Casteljau, true = Bernstein (triangle de Pascal)
     bool m_methodeBernstein = false;
+    int m_selectedPoint = -1;
+    bool m_modeSuppression = false;  
+    struct KeyState {
+        bool up = false;
+        bool down = false;
+        bool left = false;
+        bool right = false;
+    };
+
+    struct Transform {
+        float tx = 0, ty = 0;
+    };
+
+    KeyState m_keyState;
+    Transform m_transform;
+    bool m_modeTranslate = false;
+    typedef float Matrix3[3][3];
 
     inline void setSize(int w, int h) { m_width = w; m_height = h; }
 

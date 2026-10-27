@@ -156,7 +156,7 @@ void Application::update()
     time_t time = std::time(0);
 
     //m_nbPointsCourbe = 0;
-    for (int i = 0; i<100; i++) if (m_controlPoints.size() >= 2)
+    /*for (int i = 0; i<100; i++) if (m_controlPoints.size() >= 2)
     {
         for (int k = 0; k <= m_nbPas; k++)
         {
@@ -170,14 +170,28 @@ void Application::update()
             }
             m_nbPointsCourbe++;
         }
-    }
-    const time_t casteljau = std::time(0) - time;
+    }*/
 
-    std::cout << "De casteljau : " << (std::time(0) - time)*100. << '\n';
+    if (m_controlPoints.size() >= 2)
+    {
+        for (int k = 0; k <= m_nbPas; k++)
+        {
+            float t = (float)k / m_nbPas;
+            Point q = deCasteljau(m_controlPoints, t);
+
+            float x = 2.f * q.x / m_width - 1.f;
+            float y = 1.f - 2.f * q.y / m_height;
+            
+                vertices.push_back(Vertex{ vec3{x + 0.01f, y, 0.f}, vec3{0.9f, 0.2f, 0.f} });
+        }
+    }
+    //nst time_t casteljau = std::time(0) - time;
+
+    //d::cout << "De casteljau : " << (std::time(0) - time)*100. << '\n';
     // ----- points de la courbe de Bézier (Bernstein), en Bleu -----
     time = std::time(0);
 
-    for (int i = 0; i < 100; i++) if (m_controlPoints.size() >= 2)
+    /*for (int i = 0; i < 100; i++) if (m_controlPoints.size() >= 2)
     {
         for (int k = 0; k <= m_nbPas; k++)
         {
@@ -191,9 +205,23 @@ void Application::update()
             }
             m_nbPointsCourbe++;
         }
+    }*/
+
+    if (m_controlPoints.size() >= 2)
+    {
+        for (int k = 0; k <= m_nbPas; k++)
+        {
+            float t = (float)k / m_nbPas;
+            Point q = Bernstein(m_controlPoints, t);
+
+            float x = 2.f * q.x / m_width - 1.f;
+            float y = 1.f - 2.f * q.y / m_height;
+            vertices.push_back(Vertex{ vec3{ x, y + 0.01f, 0.f }, vec3{ 0.1f, 0.2f, 0.9f } });
+            m_nbPointsCourbe++;
+        }
     }
-    const time_t bernstein = std::time(0) - time;
-    std::cout << "nb : " << m_controlPoints.size() << "\ncastle : " << casteljau << "\nbernstein : " << bernstein << '\n';
+    //nst time_t bernstein = std::time(0) - time;
+   //td::cout << "nb : " << m_controlPoints.size() << "\ncastle : " << casteljau << "\nbernstein : " << bernstein << '\n';
 
     // ----- FIN AJOUT -----
 
