@@ -2,7 +2,7 @@
 
 #include <cstdint>
 #include <vector>   // AJOUT
-
+#include "Mat4.cpp"
 #include "../common/GLShader.h"
 
 
@@ -44,6 +44,7 @@ struct Application
 
     // AJOUT : les points de contrôle P0, ..., Pn
     std::vector<Point> m_controlPoints;
+    Mat4 transform = Mat4::identity();
 
     // AJOUT : nombre de pas pour tracer la courbe (pas = 1 / m_nbPas)
     int m_nbPas = 10000;

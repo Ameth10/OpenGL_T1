@@ -86,9 +86,11 @@
             "c:\\program files\\microsoft visual studio\\18\\community\\vc\\tools\\msvc\\14.51.36231\\include\\utility",
             "c:\\program files\\microsoft visual studio\\18\\community\\vc\\tools\\msvc\\14.51.36231\\include\\initializer_list",
             "c:\\program files\\microsoft visual studio\\18\\community\\vc\\tools\\msvc\\14.51.36231\\include\\cstring",
-            "c:\\program files (x86)\\windows kits\\10\\include\\10.0.26100.0\\ucrt\\string.h",
-            "c:\\program files (x86)\\windows kits\\10\\include\\10.0.26100.0\\ucrt\\corecrt_memory.h",
-            "c:\\users\\niang\\desktop\\esgi\\cours\\opengl\\opengl_t1_4rvjv\\common\\glshader.h"
+            "c:\\program files (x86)\\windows kits\\10\\include\\10.0.28000.0\\ucrt\\string.h",
+            "c:\\program files (x86)\\windows kits\\10\\include\\10.0.28000.0\\ucrt\\corecrt_memory.h",
+            "e:\\local\\cours_2027\\moteur 3d\\opengl_t1\\opengl-101\\mat4.cpp",
+            "c:\\program files\\microsoft visual studio\\18\\community\\vc\\tools\\msvc\\14.51.36231\\include\\array",
+            "e:\\local\\cours_2027\\moteur 3d\\opengl_t1\\common\\glshader.h"
         ],
         "ImportedModules": [],
         "ImportedHeaderUnits": []
